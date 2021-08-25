@@ -16,11 +16,10 @@ const dotenv = require('dotenv');
 const moment = require('moment');
 
 
-const AWS = require('aws-sdk');
+const aws = require('aws-sdk');
 // const fs = require('fs');
-const awsLoadPath = path.join(__dirname,"/config.json");
-AWS.config.loadFromPath(awsLoadPath);
-let s3 = new AWS.S3();
+aws.config.loadFromPath(__dirname + '/config.json');
+const s3 = new aws.S3();
 
 const app = express();
 
@@ -239,7 +238,7 @@ let upload = multer({
 });
 
 app.post('/question', upload.array('image'), function(req,res){
-    Ad.create(req.body,function(err,ad){n
+    Ad.create(req.body,function(err,ad){
         if(err) return res.json({success:false, message:err});
         ad.imageFileName = imageArray;
         imageNumber = 0;
@@ -253,14 +252,15 @@ let uploadAsk = multer({
     storage : multerS3({
         s3: s3,
         bucket : "benepicture",
-        contentType : multerS3.AUTO_CONTENT_TYPE,
+
         key: function (req, file, cb) {
             console.log(file);
             imageFileName = Date.now().toString() + file.originalname;
             console.log(imageFileName);
             cb(null, imageFileName);
         },
-        acl : "public-read",
+        contentType : multerS3.AUTO_CONTENT_TYPE,
+        acl : "public-read-write",
     }),
 
 });
